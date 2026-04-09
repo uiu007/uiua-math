@@ -77,3 +77,5 @@ Functions list (see in-code documentation for more detail)
 | `Ode‼!` | More configurable version of `Ode‼` |
 | `OdeT!` | Numerical integrator, outputs specific time samples |
 | `OdeT‼` | More configurable version of `OdeT!` |
+| `PolyMul` | Multiple two polynomials |
+| `PolyDiv` | Polynomial division |
