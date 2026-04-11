@@ -653,7 +653,7 @@ OdeT! ← OdeT‼∘^
 #
 ┌─╴Poly ~ PolyDiv PolyMul
   DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
-  Polymul ← (
+  PolyMul ← (
     ⊞×
     ⊙⊟⟜(⟜∘⊢△)
     ⍉⬚0 ˜↯⍉
