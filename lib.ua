@@ -261,11 +261,11 @@ Gamma ← (
 └─╴
 
 # Greatest common divisor
-# 
+#
 # Ignores sign
 GCD ← ◌⍢⤚◿±⌵
 # Least common multiple
-# 
+#
 # Ignores sign
 LCM ← ⌵÷⊃GCD×
 
@@ -275,9 +275,9 @@ LCM ← ⌵÷⊃GCD×
 └─╴
 
 # Encode an array of numbers into digits of a given base
-# 
+#
 # Analogous to `⋯` for base 2; the least significant digit is first.
-# 
+#
 # `Base` allows multiple bases as input.
 # ```uiua
 # # Encodes 6 in base 2, 7 in base 3, 8 in base 4, and 9 in base 5.
@@ -290,7 +290,7 @@ LCM ← ⌵÷⊃GCD×
 # ##   4 1 0
 # ##         ╯
 # ```
-# 
+#
 # You can use `⌝Base` to decode from a base/bases.
 # ```uiua
 # # Decodes 6 in base 2, 7 in base 3, 8 in base 4, and 9 in base 5.
@@ -340,7 +340,7 @@ PowMod ← ˜/(◿⊙×⤙˜◿˙×)ⁿ⇌⋯
 └─╴
 
 # Convert a number X to a continued fraction to N terms.
-# 
+#
 # Use `°CFrac` to convert to a number from a continued fraction.
 # ? N X
 CFrac ← ⌅(⍥⊃(÷⤚◿1)⌊|⊃⧻/(+˜÷1)⇌)
@@ -382,7 +382,7 @@ Erf ← (
 └─╴
 
 # Seeded random indices from a distribution array
-# 
+#
 # Given a seed, a shape, and a probability distribution array
 # of any rank containing positive numbers, `DistRand` normalizes
 # the distribution if necessary so it sums to 1, then returns
@@ -393,7 +393,7 @@ Erf ← (
 # given. If the distribution array is rank >1, the output will
 # have a shape equal to the shape given suffixed with the rank of
 # the distribution array.
-# 
+#
 # ```uiua
 # # Generate random indices in the shape 2_3 with a seed of 8
 # DistRand [0.1 0.4 0.3 0.2] 2_3 8
@@ -406,7 +406,7 @@ Erf ← (
 DistRand ← ˜⍜♭≡(⊢⊚>)⊓¤gen⍜♭\+÷/+⊸♭
 
 # Box-Muller transform
-# 
+#
 # Converts uniformly distributed pairs of input values to
 # standard normally distributed pairs of output values
 BoxMuller ← ∩×⤙⊓°∠∘×τF√×¯2°ₑ¬
@@ -416,47 +416,47 @@ BoxMuller ← ∩×⤙⊓°∠∘×τF√×¯2°ₑ¬
 Gaussian ← ÷/+⊸♭ₑ¯÷2˙×˜÷⌵˙⊞ℂ-÷2-1⟜⇡
 
 # Binomial distribution
-# 
+#
 # Probability that n Bernoulli trials each with success probability p will amount to X successes
 # ? p n X
 BinomPmf ← ××⊃(≡₀⧅>|˜⋅ⁿ|ⁿ⊓-¬) ⤚⋅F
 # Cumulative binomial distribution
-# 
+#
 # Probability that n Bernoulli trials each with success probability p will amount to X or fewer successes
-# 
+#
 # **NOTE:** This function only accepts scalars for X. Use `each` or `rows` if multiple X values are desired
 # ? p n X
 BinomCmf ← /+BinomPmf⊓∩¤(⇡+1)
 
 # Geometric distribution
-# 
+#
 # Probability of X failures before the first success of repeated trials with success probability p
 # ? p X
 GeomPmf ← ×⟜(˜ⁿ¬)
 # Cumulative geometric distribution
-# 
+#
 # Probability of X or fewer failures before the first success of repeated trials with success probability p
 # ? p X
 GeomCmf ← ⍜¬˜ⁿ⊙(+1)
 
 # Poisson distribution
-# 
+#
 # Probability of X occurrences of an unlikely event over many trials with expected value λ
 # ? λ X
 PoissonPmf ← ÷⊙×⊃(⋅Fact|˜ⁿ|ₑ¯)
 # Cumulative Poisson distribution
-# 
+#
 # Probability of X or fewer occurrences of an unlikely event over many trials with expected value λ
 # ? λ X
 PoissonCmf ← /+PoissonPmf⊓¤(⇡+1)
 
 # Normal distribution
-# 
+#
 # Probability density of a gaussian/bell curve with mean μ and standard deviation σ
 # ? σ μ X
 NormalPdf ← ÷⊃(×√τ|ₑ÷2¯˙×÷⊙-)
 # Cumulative normal distribution
-# 
+#
 # Probability that a normally distributed random variable with mean μ and standard deviation σ is less than X
 # ? σ μ X
 NormalCdf ← ÷2+1Erf÷×√2⊙-
@@ -464,9 +464,9 @@ NormalCdf ← ÷2+1Erf÷×√2⊙-
 # -- Misc --
 
 # Po-Shen quadratic solver
-# 
+#
 # Returns roots as a list
-# 
+#
 # Outputs complex-typed numbers only if the roots are complex
 # ? A B C
 Quad ← ⍥R⌵˜↥₀⊟⊃-+⊙F√⟜±˜-˙×⟜Fℂ₀¯÷₂∩⌞÷
@@ -521,18 +521,18 @@ OdeImpl‼ ↚ (
          [12/13 1932/2197 ¯7200/2197 7296/2197]
          [1 439/216 ¯8 3680/513 ¯845/4104]
          [1/2 ¯8/27 2 ¯3544/2565 1859/4104 ¯11/40]}
-      
+
         ⊃∧◇(
           ˜⊂¤×⊸⊃⋅⋅⋅∘(
             ⊃⋅◌^0˜∩+⊙/+∪₂⌟˜∩×⊙∘°⊂⊙⊙⊙⊙⤙⊓A‼^0∘◌
           )
         )⋅⋅⋅∘
-      
+
         [[25/216 0 1408/2565 2197/4104 ¯1/5 0]
          [16/135 0 6656/12825 28561/56430 ¯9/50 2/55]]
         ⊃(˜÷⍜°√/+♭/-)⊣ ≡/+×⌟
       ))
-  
+
     ⊙⊙⊙⊙⊙⊙⤙₂⊓A‼^0∘⋅◌
     ⟜(∪⌞⊙∘×⊃(
         ×0.84√₄˜÷OdeConfig~ε
@@ -545,21 +545,21 @@ OdeImpl‼ ↚ (
 )
 
 # More configurable version of `Ode‼`
-# 
+#
 # The first of the three functions can be used to set optional arguments:
 # - `ε` - error bound
 # - `HMin` - minimum step size
 # - `HMax` - maximum step size
 # - `H` - initial step size
 # The remaining two functions correspond to those of `Ode‼`.
-# 
+#
 # Example: Changing simulation precision.
 # This sets the simulation precision threshold to a larger value (meaning less precision, with a cheaper simulation).
 # ```uiua
 # g ← 9.81 # Gravity
 # L ← 1    # Pendulum length
 # μ ← 0.5  # Damping coefficient
-# 
+#
 # [0 12] # Initial position of 0 and velocity of 12
 # 0      # Initial time of 0
 # Ode‼!(°⊸ε 1e¯3|⋅⊃[⊣|¯+˜∩×g μ÷L∿°⊟]|<10)
@@ -568,7 +568,7 @@ OdeImpl‼ ↚ (
 Ode‼! ← OdeImpl‼^1^2 OdeConfig!(^0($"_New"˜▽@⊙-1⊢⋅⊢)^!^0)
 
 # Numerical integrator
-# 
+#
 # Takes two functions and two values.
 # - The first function should take a time value and a state vector and output the derivative of the state vector.
 # - The second function should take anywhere from 1 to 4 arguments and return 0 or 1 for whether to continue simulating. Based on how many inputs the second function takes, it will be passed:
@@ -576,41 +576,41 @@ Ode‼! ← OdeImpl‼^1^2 OdeConfig!(^0($"_New"˜▽@⊙-1⊢⋅⊢)^!^0)
 #   2. The current state vector
 #   3. The array of all past times
 #   4. The array of all past state vectors
-# 
+#
 # The two values should respectively be the initial time and the initial state vector.
-# 
+#
 # Example: Simulating a damped pendulum.
 # This simulates the motion of a damped pendulum that begins vertical with an initial angular velocity of 12 radians per second.
 # ```uiua
 # g ← 9.81 # Gravity
 # L ← 1    # Pendulum length
 # μ ← 0.5  # Damping coefficient
-# 
+#
 # [0 12] # Initial position of 0 and velocity of 12
 # 0      # Initial time of 0
 # Ode‼(⋅⊃[⊣|¯+˜∩×g μ÷L∿°⊟]|<10)
 # ```
-# 
+#
 # Uses Runge-Kutta-Fehlberg 4th-5th-order variable-step-size numerical integration.
 # T X ? T₀ X₀
 Ode‼ ← Ode‼!∘^0^1
 
 # More configurable version of `OdeT!`
-# 
+#
 # The first of the two functions can be used to set optional arguments:
 # - `ε` - error bound
 # - `HMin` - minimum step size
 # - `HMax` - maximum step size
 # - `H` - initial step size
 # The remaining function corresponds to that of `OdeT!`.
-# 
+#
 # Example: Changing simulation precision.
 # This sets the simulation precision threshold to a larger value (meaning less precision, with a cheaper simulation).
 # ```uiua
 # g ← 9.81 # Gravity
 # L ← 1    # Pendulum length
 # μ ← 0.5  # Damping coefficient
-# 
+#
 # [0 12]  # Initial position of 0 and velocity of 12
 # ⍜×⇡5 10 # Time from 0 to 10 at 5 samples per second
 # OdeT‼(°⊸ε 1e¯3|⋅⊃[⊣|¯+˜∩×g μ÷L∿°⊟])
@@ -627,25 +627,52 @@ OdeT‼ ← (
 )
 
 # Numerical integrator
-# 
+#
 # Takes a function and two values.
 # The function should take a time value and a state vector and output the derivative of the state vector.
 # The two values should be as follows:
 # 1. A list of all times to output samples at
 # 2. The initial state vector, interpreted to be the state at time equal to the smallest value in the time value list
-# 
+#
 # Example: Simulating a damped pendulum.
 # This simulates the motion of a damped pendulum that begins vertical with an initial angular velocity of 12 radians per second.
 # ```uiua
 # g ← 9.81 # Gravity
 # L ← 1    # Pendulum length
 # μ ← 0.5  # Damping coefficient
-# 
+#
 # [0 12]  # Initial position of 0 and velocity of 12
 # ⍜×⇡5 10 # Time from 0 to 10 at 5 samples per second
 # OdeT!⋅⊃[⊣|¯+˜∩×g μ÷L∿°⊟]
 # ```
-# 
+#
 # Uses Runge-Kutta-Fehlberg 4th-5th-order variable-step-size numerical integration.
 # X ? T X₀
 OdeT! ← OdeT‼∘^
+
+#
+┌─╴Poly ~ PolyDiv PolyMul
+  DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
+  Polymul ← (
+    ⊞×
+    ⊙⊟⟜(⟜∘⊢△)
+    ⍉⬚0 ˜↯⍉
+    ⍉⊂⟜(×0↯⟜⇡△)
+    ⊂⟜(×0↯⟜⇡△)
+    ˜≡↻⟜(¯⇡⊢△)
+    /+
+    DeleteLeadingZeros # It's flexible, depending on the polynomial order you use.
+  )
+
+  PolyDiv ← |2.2 (
+    ⊃(↥0 +1 ˜- ⊃(⧻⊙◌|⧻⋅∘)|⊙◌|⋅∘)
+    ⊙[]
+    ⊙((⤙⊙⋅)(⤙⊙⊙⋅)(⤙⊙⋅))
+    ⍥(
+      ⊸⊂⤙⊙⊙⊙(◌∘)◡(˜÷∩(⊢⊂⊙0))
+      ⊙(⊃(↘1⬚0-×(⤙⊙⊙⋅)(⤙⊙⋅)|⋅∘)(⤙⊙⋅)(⤙⊙⊙⋅)(⤙⊙⋅))
+      ⤚⋅⊃(∘|⋅∘)
+    )
+    ⤚⋅∘⊙⋅
+  )
+└─╴
