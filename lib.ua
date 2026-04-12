@@ -650,8 +650,23 @@ OdeT‼ ← (
 # X ? T X₀
 OdeT! ← OdeT‼∘^
 
-#
+# Base Polynomial operation
 ┌─╴Poly ~ PolyDiv PolyMul
+  # Polynomial multiplication
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from highest degree to lowest degree.
+  # Outputs a single 1D array representing the coefficients of the product polynomial.
+  #
+  # Example: Multiplying (2x + 3) and (4x + 5).
+  # This computes the coefficients for 8x^2 + 22x + 15.
+  # ```uiua
+  # PolyMul [2 3] [4 5]
+  # ```
+  #
+  # Uses outer product and shifted summation (discrete convolution) to calculate the Cauchy product.
+  # C ? A B
+
   DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
   PolyMul ← (
     ⊞×
@@ -664,6 +679,22 @@ OdeT! ← OdeT‼∘^
     DeleteLeadingZeros # It's flexible, depending on the polynomial order you use.
   )
 
+  # Polynomial division
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from highest degree to lowest degree.
+  # The first array is the dividend (numerator), and the second is the divisor (denominator).
+  # Outputs two 1D arrays: the quotient and the remainder, in that order.
+  #
+  # Example: Dividing (x^3 - 2x^2 + 4) by (x - 3).
+  # This computes the quotient (x^2 + x + 3) and the remainder (13).
+  # ```uiua
+  # PolyDiv [1 ¯2 0 4] [1 ¯3]
+  # ```
+  #
+  # Uses standard polynomial long division algorithm to incrementally eliminate leading terms.
+  # Q R ? A B
+
   PolyDiv ← |2.2 (
     ⊃(↥0 +1 ˜- ⊃(⧻⊙◌|⧻⋅∘)|⊙◌|⋅∘)
     ⊙[]
@@ -675,4 +706,58 @@ OdeT! ← OdeT‼∘^
     )
     ⤚⋅∘⊙⋅
   )
+
+  PolyDivModTwo ← |2.2 (
+    ¯-⊃(∩⧻|⊙∘) #  N A B
+    ⊙⊙⊙[0]     #  N R B Q
+
+    ⍥(
+      ⊃(⊢|⊙∘) # q R B Q
+      ⊃(↘1⬚0≠×⊙˜⊙∘|⊃(⋅⋅∘|⊂⊙⋅⋅∘))
+    )
+
+    # R B Q. Drop B and possess Q then flip.
+    ⊙⋅∘
+    ↘⊃(˜⨂1)∘
+    ˜⊙∘
+  )
+  ┌─╴test
+    # Basic Polynomial operation test
+    # DeleteLeadingZeros
+    ⍤⤙≍ [1 2 3] DeleteLeadingZeros [1 2 3 0 0]
+    ⍤⤙≍ [3 0 4] DeleteLeadingZeros [3 0 4 0]
+    ⍤⤙≍ [5] DeleteLeadingZeros [5 0 0 0]
+
+    # PolyMul
+    # (x + 1)(x - 1) = x^2 - 1
+    ⍤⤙≍ [1 0 ¯1] PolyMul [1 1] [1 ¯1]
+
+    # (x + 2)(x + 3) = x^2 + 5x + 6
+    ⍤⤙≍ [1 5 6] PolyMul [1 2] [1 3]
+
+    # (2x + 3)(4x + 5) = 8x^2 + 22x + 15
+    ⍤⤙≍ [8 22 15] PolyMul [2 3] [4 5]
+
+    # PolyDiv
+
+    # (x^2 - 1) / (x - 1) = (x + 1)  remains 0
+    ⍤⤙≍ {[1 1] [0]} {PolyDiv [1 0 ¯1] [1 ¯1]}
+
+    # (x^3 - 2x^2 + 4) / (x - 3) = (x^2 + x + 3) remains 13
+    ⍤⤙≍ {[1 1 3] [13]} {PolyDiv [1 ¯2 0 4] [1 ¯3]}
+
+    # (2x^2 + 5x + 3) / (2x + 3) = (x + 1) remains 0
+    ⍤⤙≍ {[1 1] [0]} {PolyDiv [2 5 3] [2 3]}
+    # PolyDivMod2: Polynomial division over GF(2)
+    # (x^3 + x + 1) / (x + 1) mod 2
+    # Dividend: [1 0 1 1], Divisor: [1 1]
+    # Expected: Quotient = x^2 + x [1 1 0], Remainder = 1 [1]
+    ⍤⤙≍ {[1 1 0] [1]} {PolyDivModTwo [1 0 1 1] [1 1]}
+
+    # PolyDivMod2: Hardware CRC calculation simulation
+    # Dividing a padded data stream by a generator polynomial.
+    # Data: x^4 + x^3 + x^2 [1 1 1 0 0], Generator: x^2 + 1 [1 0 1]
+    # Expected: Quotient = x^2 + x [1 1 0], Remainder = x [1 0]
+    ⍤⤙≍ {[1 1 0] [1 0]} {PolyDivModTwo [1 1 1 0 0] [1 0 1]}
+  └─╴
 └─╴
