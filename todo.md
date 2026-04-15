@@ -1,1 +1,4 @@
-`todo.md` is currently empty.
+- Detailed document.
+- Simply warp the PolyAdd, PolyMinus, and their mod version.
+- General version(literally general number field) for EEA, Matrix_Multiple, GaussianElimination.
+- Miller-Rabin. Unfortunately, we must import the additional lib uiua-bignum to avoid the risk to overflow.
