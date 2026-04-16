@@ -651,7 +651,45 @@ OdeT‼ ← (
 OdeT! ← OdeT‼∘^
 
 # Base Polynomial operation
-┌─╴Poly ~ PolyDiv PolyMul
+┌─╴Poly ~ PolyAdd PolyAddMod PolyAddModTwo PolyDiv PolyMinus PolyMinusMod PolyMinusModTwo PolyMul PolyMulMod PolyMulModTwo
+  # Polynomial addition
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from highest degree to lowest degree.
+  # Outputs a single 1D array representing the coefficients of the sum polynomial.
+  #
+  # Example: Adding (x + 1) and (x^2 + 1).
+  # This computes the coefficients for x^2 + x + 2.
+  # ```uiua
+  # PolyAdd [1 1] [1 0 1]
+  # ```
+  #
+  # Reverses the arrays, uses zero-fill to align constant terms, adds them, and reverses back.
+  # C ? A B
+  PolyAdd       ← ⇌⬚0+∩⇌
+  PolyAddMod    ← ◿⊙PolyAdd
+  PolyAddModTwo ← PolyAddMod 2
+
+  # Polynomial subtraction
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from highest degree to lowest degree.
+  # Outputs a single 1D array representing the coefficients of the difference polynomial.
+  #
+  # Example: Subtracting (x + 1) from (x^2 + 2x + 3).
+  # This computes the coefficients for x^2 + x + 2.
+  # ```uiua
+  # PolyMinus [1 2 3] [1 1]
+  # ```
+  #
+  # Reverses the arrays, uses zero-fill to align constant terms, subtracts the second from the first, and reverses back.
+  # C ? A B
+  PolyMinus       ← ˜(⇌⬚0-∩⇌)
+  PolyMinusMod    ← ◿⊙PolyMinus
+  PolyMinusModTwo ← PolyAddModTwo
+
+  DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
+
   # Polynomial multiplication
   #
   # Takes two 1D arrays representing polynomial coefficients.
@@ -666,9 +704,22 @@ OdeT! ← OdeT‼∘^
   #
   # Uses outer product and shifted summation (discrete convolution) to calculate the Cauchy product.
   # C ? A B
-
-  DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
-  PolyMul ← (
+  # Polynomial addition with modulo
+  #
+  # Takes an integer representing the modulo and two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from highest degree to lowest degree.
+  # Outputs a single 1D array representing the coefficients of the sum evaluated under modulo p.
+  # The following function has the same format to be the modulo ones.
+  #
+  # Example: Adding (2x + 2) and (2x + 1) under modulo 3.
+  # This computes the coefficients for 4x + 3, which is congruent to x.
+  # ```uiua
+  # PolyAddMod 3 [2 2] [2 1]
+  # ```
+  #
+  # Uses PolyAdd followed by applying the modulus.
+  # C ? p A B
+  PolyMul ← |2 (
     ⊞×
     ⊙⊟⟜(⟜∘⊢△)
     ⍉⬚0 ˜↯⍉
@@ -678,6 +729,8 @@ OdeT! ← OdeT‼∘^
     /+
     DeleteLeadingZeros # It's flexible, depending on the polynomial order you use.
   )
+  PolyMulMod    ← ◿⊙(Math.PolyMul)
+  PolyMulModTwo ← PolyMulMod 2
 
   # Polynomial division
   #
@@ -694,7 +747,6 @@ OdeT! ← OdeT‼∘^
   #
   # Uses standard polynomial long division algorithm to incrementally eliminate leading terms.
   # Q R ? A B
-
   PolyDiv ← |2.2 (
     ⊃(↥0 +1 ˜- ⊃(⧻⊙◌|⧻⋅∘)|⊙◌|⋅∘)
     ⊙[]
@@ -721,8 +773,74 @@ OdeT! ← OdeT‼∘^
     ↘⊃(˜⨂1)∘
     ˜⊙∘
   )
+
+  EEA‼‼ ← |4 (
+    [0] # init
+    ⍢(⊙^0
+      ⊂
+    | ^1 ⋅⋅∘
+    )
+    ⊙⋅⋅ # clear
+    ⇌
+    ⟜⋅^2
+    ⊃⧻∘ # stack: [q_0 ... q_n] x y
+    ⍥(
+      ⊃(↘1)⊢
+      ⊙^3
+    )
+  )
+  UpdateScalar ← ⊃(⋅⋅∘|-×⊙˜⊙∘)
+  InvModScalar ← (
+    # It's better to change the order.
+    # p a -> a p a -> a p
+    EEA‼‼(
+      ⊃(⌊˜÷|⋅∘|˜◿)
+    | >1
+    | (0 1)
+    | UpdateScalar
+    )
+    ◌
+    ⊙⋅
+  )
+
   ┌─╴test
     # Basic Polynomial operation test
+    # PolyAdd
+    # (x + 1) + (x^2 + 1) = x^2 + x + 2
+    ⍤⤙≍ [1 1 2] PolyAdd [1 1] [1 0 1]
+    # (2x + 3) + (4x + 5) = 6x + 8
+    ⍤⤙≍ [6 8] PolyAdd [2 3] [4 5]
+
+    # PolyMinus
+    # (x^2 + 2x + 3) - (x + 1) = x^2 + x + 2
+    ⍤⤙≍ [1 1 2] PolyMinus [1 2 3] [1 1]
+    # (x + 1) - (x^2 + 1) = -x^2 + x  (注意高次项变负)
+    ⍤⤙≍ [¯1 1 0] PolyMinus [1 1] [1 0 1]
+
+    # PolyMulMod
+    # (2x + 1) * (2x + 2) = 4x^2 + 6x + 2 ≡ x^2 + 2 (mod 3)
+    ⍤⤙≍ [1 0 2] PolyMulMod 3 [2 1] [2 2]
+
+    # PolyMulModTwo
+    # (x + 1) * (x + 1) = x^2 + 2x + 1 ≡ x^2 + 1 (mod 2)
+    ⍤⤙≍ [1 0 1] PolyMulModTwo [1 1] [1 1]
+
+    # PolyAddMod
+    # (2x + 2) + (2x + 1) = 4x + 3 ≡ x (mod 3)
+    ⍤⤙≍ [1 0] PolyAddMod 3 [2 2] [2 1]
+
+    # PolyAddModTwo
+    # (x + 1) + (x^2 + 1) = x^2 + x + 2 ≡ x^2 + x (mod 2)
+    ⍤⤙≍ [1 1 0] PolyAddModTwo [1 1] [1 0 1]
+
+    # PolyMinusMod
+    # (x + 1) - (2x + 2) = -x - 1 ≡ 2x + 2 (mod 3)
+    ⍤⤙≍ [2 2] PolyMinusMod 3 [1 1] [2 2]
+
+    # PolyMinusModTwo
+    # (x^2 + x + 1) - (x + 1) = x^2 ≡ x^2 (mod 2)
+    ⍤⤙≍ [1 0 0] PolyMinusModTwo [1 1 1] [1 1]
+
     # DeleteLeadingZeros
     ⍤⤙≍ [1 2 3] DeleteLeadingZeros [1 2 3 0 0]
     ⍤⤙≍ [3 0 4] DeleteLeadingZeros [3 0 4 0]
