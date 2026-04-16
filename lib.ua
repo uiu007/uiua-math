@@ -652,74 +652,20 @@ OdeT! ← OdeT‼∘^
 
 # Base Polynomial operation
 ┌─╴Poly ~ PolyAdd PolyAddMod PolyAddModTwo PolyDiv PolyMinus PolyMinusMod PolyMinusModTwo PolyMul PolyMulMod PolyMulModTwo
-  # Polynomial addition
-  #
-  # Takes two 1D arrays representing polynomial coefficients.
-  # The arrays should be ordered from highest degree to lowest degree.
-  # Outputs a single 1D array representing the coefficients of the sum polynomial.
-  #
-  # Example: Adding (x + 1) and (x^2 + 1).
-  # This computes the coefficients for x^2 + x + 2.
-  # ```uiua
-  # PolyAdd [1 1] [1 0 1]
-  # ```
-  #
-  # Reverses the arrays, uses zero-fill to align constant terms, adds them, and reverses back.
-  # C ? A B
-  PolyAdd       ← ⇌⬚0+∩⇌
-  PolyAddMod    ← ◿⊙PolyAdd
-  PolyAddModTwo ← PolyAddMod 2
+  # ---------------------------------------------------------
+  # Descending (Original) Implementations
+  # ---------------------------------------------------------
+  PolyAddDesc       ← ⇌⬚0+∩⇌
+  PolyAddModDesc    ← ◿⊙PolyAddDesc
+  PolyAddModTwoDesc ← PolyAddModDesc 2
 
-  # Polynomial subtraction
-  #
-  # Takes two 1D arrays representing polynomial coefficients.
-  # The arrays should be ordered from highest degree to lowest degree.
-  # Outputs a single 1D array representing the coefficients of the difference polynomial.
-  #
-  # Example: Subtracting (x + 1) from (x^2 + 2x + 3).
-  # This computes the coefficients for x^2 + x + 2.
-  # ```uiua
-  # PolyMinus [1 2 3] [1 1]
-  # ```
-  #
-  # Reverses the arrays, uses zero-fill to align constant terms, subtracts the second from the first, and reverses back.
-  # C ? A B
-  PolyMinus       ← ˜(⇌⬚0-∩⇌)
-  PolyMinusMod    ← ◿⊙PolyMinus
-  PolyMinusModTwo ← PolyAddModTwo
+  PolyMinusDesc       ← ˜(⇌⬚0-∩⇌)
+  PolyMinusModDesc    ← ◿⊙PolyMinusDesc
+  PolyMinusModTwoDesc ← PolyAddModTwoDesc
 
-  DeleteLeadingZeros ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
+  DeleteLeadingZerosDesc ← ↙⊃(-⊃(˜⨂1⇌≠0)⧻)∘
 
-  # Polynomial multiplication
-  #
-  # Takes two 1D arrays representing polynomial coefficients.
-  # The arrays should be ordered from highest degree to lowest degree.
-  # Outputs a single 1D array representing the coefficients of the product polynomial.
-  #
-  # Example: Multiplying (2x + 3) and (4x + 5).
-  # This computes the coefficients for 8x^2 + 22x + 15.
-  # ```uiua
-  # PolyMul [2 3] [4 5]
-  # ```
-  #
-  # Uses outer product and shifted summation (discrete convolution) to calculate the Cauchy product.
-  # C ? A B
-  # Polynomial addition with modulo
-  #
-  # Takes an integer representing the modulo and two 1D arrays representing polynomial coefficients.
-  # The arrays should be ordered from highest degree to lowest degree.
-  # Outputs a single 1D array representing the coefficients of the sum evaluated under modulo p.
-  # The following function has the same format to be the modulo ones.
-  #
-  # Example: Adding (2x + 2) and (2x + 1) under modulo 3.
-  # This computes the coefficients for 4x + 3, which is congruent to x.
-  # ```uiua
-  # PolyAddMod 3 [2 2] [2 1]
-  # ```
-  #
-  # Uses PolyAdd followed by applying the modulus.
-  # C ? p A B
-  PolyMul ← |2 (
+  PolyMulDesc ← |2 (
     ⊞×
     ⊙⊟⟜(⟜∘⊢△)
     ⍉⬚0 ˜↯⍉
@@ -727,27 +673,12 @@ OdeT! ← OdeT‼∘^
     ⊂⟜(×0↯⟜⇡△)
     ˜≡↻⟜(¯⇡⊢△)
     /+
-    DeleteLeadingZeros # It's flexible, depending on the polynomial order you use.
+    DeleteLeadingZerosDesc # It's flexible, depending on the polynomial order you use.
   )
-  PolyMulMod    ← ◿⊙(Math.PolyMul)
-  PolyMulModTwo ← PolyMulMod 2
+  PolyMulModDesc    ← ◿⊙(PolyMulDesc)
+  PolyMulModTwoDesc ← PolyMulModDesc 2
 
-  # Polynomial division
-  #
-  # Takes two 1D arrays representing polynomial coefficients.
-  # The arrays should be ordered from highest degree to lowest degree.
-  # The first array is the dividend (numerator), and the second is the divisor (denominator).
-  # Outputs two 1D arrays: the quotient and the remainder, in that order.
-  #
-  # Example: Dividing (x^3 - 2x^2 + 4) by (x - 3).
-  # This computes the quotient (x^2 + x + 3) and the remainder (13).
-  # ```uiua
-  # PolyDiv [1 ¯2 0 4] [1 ¯3]
-  # ```
-  #
-  # Uses standard polynomial long division algorithm to incrementally eliminate leading terms.
-  # Q R ? A B
-  PolyDiv ← |2.2 (
+  PolyDivDesc ← |2.2 (
     ⊃(↥0 +1 ˜- ⊃(⧻⊙◌|⧻⋅∘)|⊙◌|⋅∘)
     ⊙[]
     ⊙((⤙⊙⋅)(⤙⊙⊙⋅)(⤙⊙⋅))
@@ -759,7 +690,7 @@ OdeT! ← OdeT‼∘^
     ⤚⋅∘⊙⋅
   )
 
-  PolyDivModTwo ← |2.2 (
+  PolyDivModTwoDesc ← |2.2 (
     ¯-⊃(∩⧻|⊙∘) #  N A B
     ⊙⊙⊙[0]     #  N R B Q
 
@@ -773,6 +704,74 @@ OdeT! ← OdeT‼∘^
     ↘⊃(˜⨂1)∘
     ˜⊙∘
   )
+
+  # ---------------------------------------------------------
+  # Ascending (Wrapper) Implementations
+  # ---------------------------------------------------------
+
+  # Polynomial addition
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from lowest degree to highest degree (Ascending).
+  # Outputs a single 1D array representing the coefficients of the sum polynomial.
+  #
+  # Example: Adding (1 + x) and (1 + x^2).
+  # This computes the coefficients for 2 + x + x^2.
+  # ```uiua
+  # PolyAdd [1 1] [1 0 1]
+  # ```
+  PolyAdd       ← ⇌ PolyAddDesc ∩⇌
+  PolyAddMod    ← ◿⊙PolyAdd
+  PolyAddModTwo ← PolyAddMod 2
+
+  # Polynomial subtraction
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from lowest degree to highest degree (Ascending).
+  # Outputs a single 1D array representing the coefficients of the difference polynomial.
+  #
+  # Example: Subtracting (1 + x) from (3 + 2x + x^2).
+  # This computes the coefficients for 2 + x + x^2.
+  # ```uiua
+  # PolyMinus [3 2 1] [1 1]
+  # ```
+  PolyMinus       ← ⇌ PolyMinusDesc ∩⇌
+  PolyMinusMod    ← ◿⊙PolyMinus
+  PolyMinusModTwo ← PolyAddModTwo
+
+  # Equivalent to deleting trailing zeros in an ascending array
+  DeleteLeadingZeros ← ⇌ DeleteLeadingZerosDesc ⇌
+
+  # Polynomial multiplication
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from lowest degree to highest degree (Ascending).
+  # Outputs a single 1D array representing the coefficients of the product polynomial.
+  #
+  # Example: Multiplying (3 + 2x) and (5 + 4x).
+  # This computes the coefficients for 15 + 22x + 8x^2.
+  # ```uiua
+  # PolyMul [3 2] [5 4]
+  # ```
+  PolyMul       ← ⇌ PolyMulDesc ∩⇌
+  PolyMulMod    ← ◿⊙PolyMul
+  PolyMulModTwo ← PolyMulMod 2
+
+  # Polynomial division
+  #
+  # Takes two 1D arrays representing polynomial coefficients.
+  # The arrays should be ordered from lowest degree to highest degree (Ascending).
+  # The first array is the dividend (numerator), and the second is the divisor (denominator).
+  # Outputs two 1D arrays: the quotient and the remainder, in that order.
+  #
+  # Example: Dividing (4 - 2x^2 + x^3) by (-3 + x).
+  # This computes the quotient (3 + x + x^2) and the remainder (13).
+  # ```uiua
+  # PolyDiv [4 0 ¯2 1] [¯3 1]
+  # ```
+  PolyDiv ← |2.2 (∩⇌ PolyDivDesc ∩⇌)
+
+  PolyDivModTwo ← |2.2 (∩⇌ PolyDivModTwoDesc ∩⇌)
 
   EEA‼‼ ← |4 (
     [0] # init
@@ -804,78 +803,80 @@ OdeT! ← OdeT‼∘^
   )
 
   ┌─╴test
-    # Basic Polynomial operation test
+    # Basic Polynomial operation test (Now purely Ascending)
+    
     # PolyAdd
-    # (x + 1) + (x^2 + 1) = x^2 + x + 2
-    ⍤⤙≍ [1 1 2] PolyAdd [1 1] [1 0 1]
-    # (2x + 3) + (4x + 5) = 6x + 8
-    ⍤⤙≍ [6 8] PolyAdd [2 3] [4 5]
+    # (1 + x) + (1 + x^2) = 2 + x + x^2
+    ⍤⤙≍ [2 1 1] PolyAdd [1 1] [1 0 1]
+    # (3 + 2x) + (5 + 4x) = 8 + 6x
+    ⍤⤙≍ [8 6] PolyAdd [3 2] [5 4]
 
     # PolyMinus
-    # (x^2 + 2x + 3) - (x + 1) = x^2 + x + 2
-    ⍤⤙≍ [1 1 2] PolyMinus [1 2 3] [1 1]
-    # (x + 1) - (x^2 + 1) = -x^2 + x  (注意高次项变负)
-    ⍤⤙≍ [¯1 1 0] PolyMinus [1 1] [1 0 1]
+    # (3 + 2x + x^2) - (1 + x) = 2 + x + x^2
+    ⍤⤙≍ [2 1 1] PolyMinus [3 2 1] [1 1]
+    # (1 + x) - (1 + x^2) = x - x^2  (注意高次项变负)
+    ⍤⤙≍ [0 1 ¯1] PolyMinus [1 1] [1 0 1]
 
     # PolyMulMod
-    # (2x + 1) * (2x + 2) = 4x^2 + 6x + 2 ≡ x^2 + 2 (mod 3)
-    ⍤⤙≍ [1 0 2] PolyMulMod 3 [2 1] [2 2]
+    # (1 + 2x) * (2 + 2x) = 2 + 6x + 4x^2 ≡ 2 + x^2 (mod 3)
+    ⍤⤙≍ [2 0 1] PolyMulMod 3 [1 2] [2 2]
 
     # PolyMulModTwo
-    # (x + 1) * (x + 1) = x^2 + 2x + 1 ≡ x^2 + 1 (mod 2)
+    # (1 + x) * (1 + x) = 1 + 2x + x^2 ≡ 1 + x^2 (mod 2)
     ⍤⤙≍ [1 0 1] PolyMulModTwo [1 1] [1 1]
 
     # PolyAddMod
-    # (2x + 2) + (2x + 1) = 4x + 3 ≡ x (mod 3)
-    ⍤⤙≍ [1 0] PolyAddMod 3 [2 2] [2 1]
+    # (2 + 2x) + (1 + 2x) = 3 + 4x ≡ x (mod 3)
+    ⍤⤙≍ [0 1] PolyAddMod 3 [2 2] [1 2]
 
     # PolyAddModTwo
-    # (x + 1) + (x^2 + 1) = x^2 + x + 2 ≡ x^2 + x (mod 2)
-    ⍤⤙≍ [1 1 0] PolyAddModTwo [1 1] [1 0 1]
+    # (1 + x) + (1 + x^2) = 2 + x + x^2 ≡ x + x^2 (mod 2)
+    ⍤⤙≍ [0 1 1] PolyAddModTwo [1 1] [1 0 1]
 
     # PolyMinusMod
-    # (x + 1) - (2x + 2) = -x - 1 ≡ 2x + 2 (mod 3)
+    # (1 + x) - (2 + 2x) = -1 - x ≡ 2 + 2x (mod 3)
     ⍤⤙≍ [2 2] PolyMinusMod 3 [1 1] [2 2]
 
     # PolyMinusModTwo
-    # (x^2 + x + 1) - (x + 1) = x^2 ≡ x^2 (mod 2)
-    ⍤⤙≍ [1 0 0] PolyMinusModTwo [1 1 1] [1 1]
+    # (1 + x + x^2) - (1 + x) = x^2 ≡ x^2 (mod 2)
+    ⍤⤙≍ [0 0 1] PolyMinusModTwo [1 1 1] [1 1]
 
-    # DeleteLeadingZeros
-    ⍤⤙≍ [1 2 3] DeleteLeadingZeros [1 2 3 0 0]
-    ⍤⤙≍ [3 0 4] DeleteLeadingZeros [3 0 4 0]
-    ⍤⤙≍ [5] DeleteLeadingZeros [5 0 0 0]
+    # DeleteLeadingZeros (Effectively trimming trailing zeroes in ascending)
+    ⍤⤙≍ [3 2 1] DeleteLeadingZeros [0 0 3 2 1]
+    ⍤⤙≍ [4 0 3] DeleteLeadingZeros [0 4 0 3]
+    ⍤⤙≍ [5] DeleteLeadingZeros [0 0 0 5]
 
     # PolyMul
-    # (x + 1)(x - 1) = x^2 - 1
-    ⍤⤙≍ [1 0 ¯1] PolyMul [1 1] [1 ¯1]
+    # (1 + x)(-1 + x) = -1 + x^2
+    ⍤⤙≍ [¯1 0 1] PolyMul [1 1] [¯1 1]
 
-    # (x + 2)(x + 3) = x^2 + 5x + 6
-    ⍤⤙≍ [1 5 6] PolyMul [1 2] [1 3]
+    # (2 + x)(3 + x) = 6 + 5x + x^2
+    ⍤⤙≍ [6 5 1] PolyMul [2 1] [3 1]
 
-    # (2x + 3)(4x + 5) = 8x^2 + 22x + 15
-    ⍤⤙≍ [8 22 15] PolyMul [2 3] [4 5]
+    # (3 + 2x)(5 + 4x) = 15 + 22x + 8x^2
+    ⍤⤙≍ [15 22 8] PolyMul [3 2] [5 4]
 
     # PolyDiv
 
-    # (x^2 - 1) / (x - 1) = (x + 1)  remains 0
-    ⍤⤙≍ {[1 1] [0]} {PolyDiv [1 0 ¯1] [1 ¯1]}
+    # (-1 + x^2) / (-1 + x) = (1 + x)  remains 0
+    ⍤⤙≍ {[1 1] [0]} {PolyDiv [¯1 0 1] [¯1 1]}
 
-    # (x^3 - 2x^2 + 4) / (x - 3) = (x^2 + x + 3) remains 13
-    ⍤⤙≍ {[1 1 3] [13]} {PolyDiv [1 ¯2 0 4] [1 ¯3]}
+    # (4 - 2x^2 + x^3) / (-3 + x) = (3 + x + x^2) remains 13
+    ⍤⤙≍ {[3 1 1] [13]} {PolyDiv [4 0 ¯2 1] [¯3 1]}
 
-    # (2x^2 + 5x + 3) / (2x + 3) = (x + 1) remains 0
-    ⍤⤙≍ {[1 1] [0]} {PolyDiv [2 5 3] [2 3]}
+    # (3 + 5x + 2x^2) / (3 + 2x) = (1 + x) remains 0
+    ⍤⤙≍ {[1 1] [0]} {PolyDiv [3 5 2] [3 2]}
+    
     # PolyDivMod2: Polynomial division over GF(2)
-    # (x^3 + x + 1) / (x + 1) mod 2
-    # Dividend: [1 0 1 1], Divisor: [1 1]
-    # Expected: Quotient = x^2 + x [1 1 0], Remainder = 1 [1]
-    ⍤⤙≍ {[1 1 0] [1]} {PolyDivModTwo [1 0 1 1] [1 1]}
+    # (1 + x + x^3) / (1 + x) mod 2
+    # Dividend: [1 1 0 1], Divisor: [1 1]
+    # Expected: Quotient = x + x^2 [0 1 1], Remainder = 1 [1]
+    ⍤⤙≍ {[0 1 1] [1]} {PolyDivModTwo [1 1 0 1] [1 1]}
 
     # PolyDivMod2: Hardware CRC calculation simulation
     # Dividing a padded data stream by a generator polynomial.
-    # Data: x^4 + x^3 + x^2 [1 1 1 0 0], Generator: x^2 + 1 [1 0 1]
-    # Expected: Quotient = x^2 + x [1 1 0], Remainder = x [1 0]
-    ⍤⤙≍ {[1 1 0] [1 0]} {PolyDivModTwo [1 1 1 0 0] [1 0 1]}
+    # Data: x^2 + x^3 + x^4 [0 0 1 1 1], Generator: 1 + x^2 [1 0 1]
+    # Expected: Quotient = x + x^2 [0 1 1], Remainder = x [0 1]
+    ⍤⤙≍ {[0 1 1] [0 1]} {PolyDivModTwo [0 0 1 1 1] [1 0 1]}
   └─╴
 └─╴
